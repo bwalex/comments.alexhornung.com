@@ -1,0 +1,15 @@
+.comments
+  - for comment in comments
+    .comment-view
+      .meta
+        .top
+          .date-created
+            = comment.created_at
+          .clearer
+        .user
+          %img{ :src => "http://www.gravatar.com/avatar/#{comment.hashed_mail}?d=mm&s=48", :alt => "user picture" }
+        .name
+          = comment.name
+      .text
+        = comment.comment
+      .clearer

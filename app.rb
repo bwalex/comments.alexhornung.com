@@ -11,14 +11,10 @@ require 'foreigner'
 require 'redcarpet'
 require 'pygments'
 
-require 'diffy'
-
 require 'sinatra'
 require 'logger'
 
 require 'haml'
-require 'erb'
-include ERB::Util
 
 require './db.rb'
 
@@ -69,7 +65,7 @@ post '/comments/site/:site_name/article/:article_hash' do
     @article = @site.articles.create!(:name => params[:article_hash])
   end
 
-  @comment = @article.comments.create!(:new_mail => params[:email], :request => request, :name => params[:name], :comment => params[:comment])
+  @comment = @article.comments.create!(:email => params[:email], :request => request, :name => params[:name], :comment => params[:comment])
 
   redirect request.referrer unless request.referrer.nil?
   "Comment posted. Thank you!"
@@ -80,7 +76,7 @@ get '/comments/site/:site_name/article/:article_hash' do
   content_type :html
   @site = Site.find_by_name!(params[:site_name])
   @article = @site.articles.find_by_name!(params[:article_hash])
-  @comments = @article.comments.where(:spam => false)
+  @comments = @article.comments.where(:spam => false).order('created_at ASC')
 
   haml :comments, :format => :html5, :locals => { :comments => @comments }
 end
@@ -99,7 +95,7 @@ post '/comments/api/site/:site_name/article/:article_hash' do
     @article = Article.create!(:name => params[:article_hash])
   end
 
-  @comment = @article.comments.create!(:new_mail => data['email'], :request => request, :name => data['name'], :comment => data['comment'])
+  @comment = @article.comments.create!(:email => data['email'], :request => request, :name => data['name'], :comment => data['comment'])
   @comment.to_json
 end
 
@@ -218,7 +214,7 @@ error ActiveRecord::RecordNotFound do
   if @api
     { "errors" => ["Resource not found"] }.to_json
   else
-    "Resource not found"
+    "No comments yet..."
   end
-  status 404
+  status 404 if @api
 end

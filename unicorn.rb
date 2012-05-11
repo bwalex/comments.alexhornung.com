@@ -8,6 +8,7 @@ preload_app true
 timeout 30
 listen "127.0.0.1:1234"
 
+pid "unicorn.pid"
 
 # Set the path of the log files inside the log folder of the testapp
 #stderr_path "/var/rails/testapp/log/unicorn.stderr.log"

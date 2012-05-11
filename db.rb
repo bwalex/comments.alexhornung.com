@@ -121,17 +121,16 @@ end
 
 
 class Comment < ActiveRecord::Base
-  attr_accessor :new_mail
   attr_accessor :request
   attr_accessor :permalink
 
   belongs_to :article
 
-  validates :new_mail, :presence => true, :email => true
+  validates :email, :presence => true, :email => true
   validates :name, :length => { :in => 2..255 }
   validates :comment, :length => { :minimum => 2 }
 
-  before_save :hash_mail, :if => :new_mail?
+  before_save :save_extra
   before_save :check_spam
   before_save :sanitize_comment
 
@@ -150,7 +149,7 @@ class Comment < ActiveRecord::Base
 
       self[:spam] = Akismet.spam?({
         :comment_author => self[:name],
-        :comment_author_email => @new_mail,
+        :comment_author_email => self[:email],
         :comment_content => self[:comment],
         :permalink => @permalink
       }, @request)
@@ -158,13 +157,15 @@ class Comment < ActiveRecord::Base
 
     return true
   end
-  
-  def new_mail?
-    !@new_mail.blank?
+
+  def email= mail
+    self[:email] = mail.strip.downcase
   end
 
-  def hash_mail
-    self[:hashed_mail] = Digest::MD5.hexdigest(@new_mail.strip.downcase)
+  def save_extra
+    self[:hashed_mail] = Digest::MD5.hexdigest(self[:email].strip.downcase)
+    self[:ip] = @request.ip
+    return true
   end
 
   def created_at

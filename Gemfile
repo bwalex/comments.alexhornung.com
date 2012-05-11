@@ -21,7 +21,6 @@ gem "sinatra", "~> 1.3.2"
 gem "logger", "~> 1.2.8"
 gem "redcarpet", "~> 2.1.1"
 gem "pygments.rb", "~> 0.2.7"
-gem "diffy", "~> 2.0.6"
 gem "haml", "~> 3.1.4"
 gem "sass", "~> 3.1.15"
 

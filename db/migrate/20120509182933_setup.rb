@@ -20,8 +20,10 @@ class Setup < ActiveRecord::Migration
     create_table :comments do |t|
       t.references :article
       t.boolean    :spam
+      t.string     :email
       t.string     :hashed_mail
       t.string     :name
+      t.string     :ip
       t.text       :comment
       t.timestamps
     end
@@ -40,10 +42,13 @@ class Setup < ActiveRecord::Migration
     create_table :users do |t|
       t.string :name
       t.string :email
+      t.string :openid
       t.string :password
       t.string :salt
       t.timestamps
     end
+
+    add_index :users, :openid, :unique => false #otherwise we can't have NULLs
 
 
     create_table :site_users do |t|
